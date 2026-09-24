@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
 from app.models import Product
-from app.schemas import ProductCreate
+from app.schemas import ProductCreate, ProductUpdate
 
 router = APIRouter(prefix="/api/products", tags=["Products"])
 
@@ -32,3 +32,29 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
 @router.get("/{product_id}")
 def get_product(product_id: int, db: Session = Depends(get_db)):
     return db.query(Product).filter(Product.id == product_id).first()
+
+
+@router.put("/{product_id}")
+def update_product(
+    product_id: int,
+    product: ProductUpdate,
+    db: Session = Depends(get_db),
+):
+    existing_product = (
+        db.query(Product)
+        .filter(Product.id == product_id)
+        .first()
+    )
+
+    if existing_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    existing_product.name = product.name
+    existing_product.description = product.description
+    existing_product.price = product.price
+    existing_product.stock_quantity = product.stock_quantity
+
+    db.commit()
+    db.refresh(existing_product)
+
+    return existing_product
