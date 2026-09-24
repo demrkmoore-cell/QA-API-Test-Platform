@@ -114,8 +114,8 @@ def test_delete_product():
 
     get_response = requests.get(f"{BASE_URL}/api/products/{product_id}")
 
-    assert get_response.status_code == 200
-    assert get_response.json() is None
+    assert get_response.status_code == 404
+    assert get_response.json()["detail"] == "Product not found"
 
 
 def test_delete_product_not_found():
