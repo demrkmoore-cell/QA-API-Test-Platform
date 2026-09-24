@@ -27,3 +27,8 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     db.refresh(new_product)
 
     return new_product
+
+
+@router.get("/{product_id}")
+def get_product(product_id: int, db: Session = Depends(get_db)):
+    return db.query(Product).filter(Product.id == product_id).first()
