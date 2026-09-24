@@ -60,20 +60,40 @@ Supporting project documentation and QA materials are maintained in:
 * PostgreSQL
 * SQL
 * Git & GitHub
+* GitHub Actions / CI
 * Page Object Model (POM)
+
+## Continuous Integration
+
+GitHub Actions automatically runs the API, database, and Playwright UI test suites on pushes to `main` and pull requests.
+
+The CI workflow:
+
+* Sets up the Python test environment
+* Provisions a PostgreSQL test database
+* Initializes the database schema and test data
+* Starts the application/API
+* Runs the API and database test suite
+* Installs the Playwright Chromium browser
+* Runs the Playwright UI test suite
+* Uploads the application log if a workflow run fails
 
 ## Project Structure
 
 ```text
 QA-API-Test-Platform/
-├── app/             # Application/API
-├── database/        # Database and PostgreSQL resources
-├── docs/            # Project documentation
-├── tests/           # Python API tests
-├── ui-tests/        # Playwright UI automation
-├── pytest.ini       # Pytest configuration
-├── requirements.txt # Python dependencies
-└── .gitignore
+├── .github/
+│   └── workflows/
+│       └── qa-tests.yml       # GitHub Actions CI workflow
+├── app/                       # Application/API
+├── database/                  # Database and PostgreSQL resources
+├── docs/                      # Project documentation
+├── tests/                     # Python API tests
+├── ui-tests/                  # Playwright UI automation
+├── .gitignore                 # Git ignore rules
+├── pytest.ini                 # Pytest configuration
+├── requirements.txt           # Python dependencies
+└── README.md                  # Project documentation
 ```
 
 ## Running the Tests
@@ -116,6 +136,7 @@ This portfolio demonstrates hands-on experience with:
 * Applying Page Object Model principles
 * Organizing tests into maintainable project structures
 * Using Git and GitHub for version control
+* Implementing automated testing with GitHub Actions CI
 * Documenting QA work so another tester or recruiter can understand and run the project
 
 ## Portfolio Goal
