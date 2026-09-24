@@ -1,3 +1,6 @@
 .venv/
 __pycache__/
 .env
+
+Postman Agent/
+postman-agent-0.5.1-linux-x64.tar.gz
