@@ -1,0 +1,74 @@
+name: QA Test Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: qa_api_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d qa_api_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/qa_api_test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Initialize test database
+        run: |
+          PGPASSWORD=postgres psql -h 127.0.0.1 -U postgres -d qa_api_test -f database/schema.sql
+          PGPASSWORD=postgres psql -h 127.0.0.1 -U postgres -d qa_api_test -c "INSERT INTO products (name, description, price, stock_quantity) VALUES ('Postman QA Product', 'Seed product for automated CI testing', 79.99, 15);"
+
+      - name: Start application
+        run: |
+          uvicorn app.main:app --host 127.0.0.1 --port 8000 > app.log 2>&1 &
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8000/health; then
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Run API and database tests
+        run: pytest tests -v
+
+      - name: Install Playwright browser
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run UI tests
+        run: pytest ui-tests -v
+
+      - name: Upload application log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-log
+          path: app.log
