@@ -7,3 +7,4 @@ requests
 pytest
 httpx
 python-dotenv
+pytest-playwright
