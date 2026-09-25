@@ -139,6 +139,11 @@ This portfolio demonstrates hands-on experience with:
 * Implementing automated testing with GitHub Actions CI
 * Documenting QA work so another tester or recruiter can understand and run the project
 
+## Author
+
+**DeMarko Moore**  
+**GitHub:** [@demrkmoore-cell](https://github.com/demrkmoore-cell)
+
 ## Portfolio Goal
 
 The goal of this project is to demonstrate practical QA engineering skills through a working, testable application rather than relying solely on coursework or theoretical examples.
