@@ -100,9 +100,9 @@ The app health endpoint is [http://127.0.0.1:8000/health](http://127.0.0.1:8000/
 
 ## CI
 
-The workflow at `.github/workflows/qa-platform-tests.yml` runs on pushes and pull requests to `main`, and can be started manually. It provisions a disposable PostgreSQL service, applies the schema, seeds the UI fixture, installs Python and Chromium dependencies, starts the application, and runs Pytest.
+The workflow at `.github/workflows/qa-tests.yml` runs on pushes and pull requests to `main`, and can be started manually. It provisions a disposable PostgreSQL service, applies the schema, seeds the UI fixture, installs Python and Chromium dependencies, starts the application, and runs Pytest.
 
-The workflow has been added to the repository, but its first GitHub Actions run must complete successfully before the CI pipeline should be described as verified.
+The workflow already existed and has been updated through the added HTML-escaping regression test. Check the latest GitHub Actions run for the current commit before reporting the latest code as CI-verified.
 
 ## Limitations
 
