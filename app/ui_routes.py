@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import HTMLResponse
+from html import escape
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
@@ -18,7 +19,7 @@ def products_page(db: Session = Depends(get_db)):
         product_rows += f"""
         <tr>
             <td>{product.id}</td>
-            <td>{product.name}</td>
+            <td>{escape(product.name)}</td>
             <td>${product.price}</td>
             <td>{product.stock_quantity}</td>
         </tr>
