@@ -51,8 +51,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/schema.sql
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          psql "postgresql://postgres:postgres@localhost:5432/qa_platform_test" -v ON_ERROR_STOP=1 -f database/schema.sql
+          psql "postgresql://postgres:postgres@localhost:5432/qa_platform_test" -v ON_ERROR_STOP=1 <<'SQL'
           INSERT INTO products (name, description, price, stock_quantity)
           SELECT 'Postman QA Product', 'UI test fixture', 79.99, 15
           WHERE NOT EXISTS (
