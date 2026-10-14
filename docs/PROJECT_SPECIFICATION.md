@@ -4,6 +4,8 @@
 
 A backend-focused QA portfolio project demonstrating end-to-end software quality practices across REST API testing, Python automation, PostgreSQL database validation, UI automation, CI/CD, defect tracking, and AI-assisted development.
 
+> **Implementation status:** This document records the intended project scope and roadmap. The current implementation covers the product API (create, read, update, and delete), product input validation, PostgreSQL persistence, a product-list UI, health checks, API/database tests, Playwright UI tests, and GitHub Actions CI. The customer, authentication, order, and order-item workflows listed below are planned scope and are not currently implemented.
+
 ## Application Domain
 
 Order Management System
