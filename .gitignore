@@ -4,3 +4,10 @@ __pycache__/
 
 Postman Agent/
 postman-agent-0.5.1-linux-x64.tar.gz
+.pytest_cache/
+*.py[cod]
+.DS_Store
+Thumbs.db
+app.log
+playwright-report/
+test-results/
