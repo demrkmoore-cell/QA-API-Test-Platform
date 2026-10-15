@@ -2,7 +2,6 @@ from html import escape
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import HTMLResponse
-from html import escape
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
