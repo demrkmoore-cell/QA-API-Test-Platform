@@ -1,23 +1,24 @@
 # QA API Test Platform
 
-A hands-on QA engineering portfolio demonstrating API testing, Python automation, database validation, and UI test automation.
+A scoped FastAPI and PostgreSQL portfolio project demonstrating API testing, Python automation, database validation, and browser UI testing with Playwright.
 
-## Project Overview
+## What is implemented
 
-This project demonstrates how I approach software quality across multiple layers of an application—from REST API validation and automated testing to database verification and browser-based UI testing.
+- FastAPI product API: list, create, retrieve, update, and delete.
+- Pydantic request validation for product names, prices, and stock quantities.
+- PostgreSQL persistence through SQLAlchemy.
+- Health endpoint at `/health` and HTML product list at `/products`.
+- API tests for CRUD behavior, validation, and not-found responses.
+- Database checks and Playwright UI tests using a Page Object.
+- GitHub Actions workflow that provisions PostgreSQL, initializes test data, starts the application, and runs the test suite.
 
-The project is built around a product API backed by PostgreSQL, with automated tests designed to validate both expected behavior and negative/error scenarios.
+**Scope honesty:** `docs/PROJECT_SPECIFICATION.md` describes a broader planned order-management system. Customer, authentication, order, and order-item application workflows are not implemented. Their presence in the SQL schema does not mean those API features exist.
 
-## QA & Automation Coverage
+## Technology
 
-### API Testing
+Python 3.11 · FastAPI · Pydantic · SQLAlchemy · PostgreSQL · Pytest · Requests · Playwright · Chromium · GitHub Actions
 
-- REST API testing with Python and Pytest
-- Positive and negative API scenarios
-- HTTP status-code validation
-- Response validation
-- Missing/invalid product scenarios
-- API behavior validation against expected results
+## Local setup
 
 **API tests:** `tests/`
 
@@ -112,148 +113,98 @@ These instructions run the application and tests locally. You will need Python 3
 ```bash
 git clone https://github.com/demrkmoore-cell/QA-API-Test-Platform.git
 cd QA-API-Test-Platform
-```
-
-### 2. Create and activate a Python virtual environment
-
-**Linux / macOS / Chromebook Linux:**
-
-```bash
 python3 -m venv .venv
 source .venv/bin/activate
-```
-
-**Windows PowerShell:**
-
-```powershell
-py -3 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-```
-
-If PowerShell blocks activation due to its execution policy, you can run the environment's Python directly as `.\.venv\Scripts\python.exe` instead.
-
-### 3. Install Python dependencies and the Playwright browser
-
-With the virtual environment active, run:
-
-```bash
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-On Linux CI or a Linux machine missing browser system libraries, use `python -m playwright install --with-deps chromium` if you have the required system package permissions.
+On Linux systems that need Playwright browser libraries, use `python -m playwright install --with-deps chromium` if you have permission to install system packages.
 
-### 4. Create the PostgreSQL database
+Copy `.env.example` to `.env` and replace the example database connection details with your local PostgreSQL credentials. Keep `.env` private; it is ignored by Git. Use a **dedicated test database** because the tests create, update, and delete records.
 
-Make sure the PostgreSQL service is running. Create a local database named `qa_api_test` using a PostgreSQL account with permission to create databases.
-
-For example, if your local PostgreSQL role is `postgres`:
+Create a test database (example role: `postgres`):
 
 ```bash
-createdb -U postgres qa_api_test
+createdb -U postgres qa_platform_test
 ```
 
-If `createdb` is unavailable or your account cannot create databases, create `qa_api_test` through your PostgreSQL administration tool or ask your database administrator to create it. If the database already exists, skip the creation command.
-
-### 5. Configure the database connection
-
-The application reads its connection string from the `DATABASE_URL` environment variable. Use your own local PostgreSQL username and password; do not commit real credentials to Git.
-
-**Linux / macOS / Chromebook Linux (bash):**
+Initialize the schema:
 
 ```bash
-export DATABASE_URL="postgresql+psycopg2://postgres:YOUR_PASSWORD@127.0.0.1:5432/qa_api_test"
+psql -U postgres -d qa_platform_test -f database/schema.sql
 ```
 
-**Windows PowerShell:**
-
-```powershell
-$env:DATABASE_URL = "postgresql+psycopg2://postgres:YOUR_PASSWORD@127.0.0.1:5432/qa_api_test"
-```
-
-Replace `YOUR_PASSWORD` with your local PostgreSQL password. If your username or database name differs, update those parts of the URL. If the password contains URL-reserved characters, URL-encode them in the connection string.
-
-Set this variable in each terminal window used to run the application or tests. Alternatively, you can place the local value in a root-level `.env` file (which is ignored by Git); never commit that file or real credentials.
-
-### 6. Initialize the schema and test data
-
-From the repository root, apply the SQL schema:
+Seed the product expected by the UI test. This is safe to repeat in the test database:
 
 ```bash
-psql -U postgres -d qa_api_test -f database/schema.sql
+psql -U postgres -d qa_platform_test -c "INSERT INTO products (name, description, price, stock_quantity) SELECT 'Postman QA Product', 'UI test fixture', 79.99, 15 WHERE NOT EXISTS (SELECT 1 FROM products WHERE name = 'Postman QA Product');"
 ```
 
-Seed the product used by the UI/CI workflow. This command avoids adding a duplicate seed row when run repeatedly:
+Set `DATABASE_URL` in the terminal used to run the app and tests. The example uses a local PostgreSQL role named `postgres`:
 
 ```bash
-psql -U postgres -d qa_api_test -c "INSERT INTO products (name, description, price, stock_quantity) SELECT 'Postman QA Product', 'Seed product for automated testing', 79.99, 15 WHERE NOT EXISTS (SELECT 1 FROM products WHERE name = 'Postman QA Product');"
+export DATABASE_URL="postgresql+psycopg2://postgres:YOUR_PASSWORD@127.0.0.1:5432/qa_platform_test"
 ```
 
-If you use a PostgreSQL role other than `postgres`, replace the username in the `psql` commands. The role must have permission to create and modify tables and insert test data in `qa_api_test`.
+Replace `YOUR_PASSWORD`; URL-encode reserved characters in the password if necessary. Alternatively, put the local connection string in the ignored `.env` file.
 
-### 7. Start the application
-
-In a terminal with the virtual environment activated and `DATABASE_URL` configured, run:
+Start the app from the repository root:
 
 ```bash
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-Keep this terminal open while running the UI tests. Confirm the application health endpoint responds at [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health). The API's interactive documentation is available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
-
-### 8. Run the tests
-
-Open a second terminal in the repository root, activate the same virtual environment, and set `DATABASE_URL` in that terminal too.
-
-**Run API and database tests:**
+In a second terminal with the same virtual environment and `DATABASE_URL`:
 
 ```bash
-pytest tests -v
+pytest -v
 ```
 
-**Run Playwright UI tests:**
+The app health endpoint is [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health); interactive API docs are at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-```bash
-pytest ui-tests -v
-```
+## Implemented endpoints
 
-**Run UI tests with a visible browser:**
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/` | Application status message |
+| GET | `/health` | Health check |
+| GET | `/api/products/` | List products |
+| POST | `/api/products/` | Create a product |
+| GET | `/api/products/{product_id}` | Retrieve a product |
+| PUT | `/api/products/{product_id}` | Update a product |
+| DELETE | `/api/products/{product_id}` | Delete a product |
+| GET | `/products` | HTML product table |
 
-```bash
-pytest ui-tests -v --headed
-```
+## Repository guide
 
-To run the UI tests in headed mode, use a desktop session that can display a browser. In a headless environment, run the normal UI command.
+- `app/` — FastAPI routes, schemas, database setup, and SQLAlchemy model.
+- `database/schema.sql` — PostgreSQL table definitions.
+- `tests/api/` — API behavior, validation, and HTML escaping regression tests.
+- `tests/database/` — database-level checks.
+- `ui-tests/` — Playwright page object and browser tests.
+- `docs/PROJECT_SPECIFICATION.md` — intended scope and roadmap, including planned features.
 
-### Troubleshooting
+## CI
 
-- **Database connection errors:** Confirm PostgreSQL is running, the database exists, and `DATABASE_URL` matches your local credentials.
-- **Missing table errors:** Re-run the schema command from Step 6 against `qa_api_test`.
-- **Missing product/empty product list:** Run the seed command from Step 6.
-- **Browser launch errors:** Run `python -m playwright install chromium` inside the active virtual environment.
-- **Port 8000 is already in use:** Stop the other process using that port or change the port and use the matching address for your local checks.
+The workflow at `.github/workflows/qa-tests.yml` runs on pushes and pull requests to `main`, and can be started manually. It provisions a disposable PostgreSQL service, applies the schema, seeds the UI fixture, installs Python and Chromium dependencies, starts the application, and runs Pytest.
 
-## What This Project Demonstrates
+The workflow already existed and has been updated through the added HTML-escaping regression test. Check the latest GitHub Actions run for the current commit before reporting the latest code as CI-verified.
 
-This portfolio demonstrates hands-on experience with:
+## Limitations
 
-- Designing and executing API test scenarios
-- Automating API validation with Python and Pytest
-- Testing positive, negative, and error conditions
-- Validating backend data with PostgreSQL
-- Building browser automation with Playwright
-- Applying Page Object Model principles
-- Organizing tests into maintainable project structures
-- Using Git and GitHub for version control
-- Implementing automated testing with GitHub Actions CI
-- Documenting QA work so another tester or recruiter can understand and run the project
+This is a learning and QA portfolio application, not a production-ready commerce system. It does not implement authentication/authorization, customer or order API workflows, database migrations, or production deployment hardening. The database tests mutate data, so test isolation matters. Dependencies are listed in `requirements.txt`; install them in a virtual environment.
+
+## What it demonstrates
+
+- Positive, negative, boundary, and not-found API checks
+- Product CRUD testing and request validation
+- PostgreSQL-backed data verification
+- Playwright UI checks and Page Object Model
+- A regression test for HTML escaping of user-controlled product names
+- Git/GitHub workflow and automated test execution
 
 ## Author
 
-**DeMarko Moore**  
-**GitHub:** [@demrkmoore-cell](https://github.com/demrkmoore-cell)
-
-## Portfolio Goal
-
-The goal of this project is to demonstrate practical QA engineering skills through a working, testable application rather than relying solely on coursework or theoretical examples.
+**DeMarko Moore** · [GitHub: @demrkmoore-cell](https://github.com/demrkmoore-cell)

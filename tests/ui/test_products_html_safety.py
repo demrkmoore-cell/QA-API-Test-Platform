@@ -5,7 +5,7 @@ REQUEST_TIMEOUT = 10
 
 
 def test_product_name_is_escaped_in_html(product_factory):
-    product_name = "<script>alert('xss')</script>"
+    product_name = '<script>alert("qa-test")</script>'
 
     create_response = product_factory({
         "name": product_name,
@@ -23,6 +23,5 @@ def test_product_name_is_escaped_in_html(product_factory):
     assert page_response.status_code == 200
 
     html = page_response.text
-    assert "&lt;script&gt;" in html
-    assert "&lt;/script&gt;" in html
+    assert '&lt;script&gt;alert(&quot;qa-test&quot;)&lt;/script&gt;' in html
     assert product_name not in html
