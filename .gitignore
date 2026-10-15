@@ -11,3 +11,5 @@ Thumbs.db
 app.log
 playwright-report/
 test-results/
+
+.audit-venv/

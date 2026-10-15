@@ -18,11 +18,22 @@ def test_products_page_loads(page: Page):
     expect(products_page.products_table).to_be_visible()
 
 
-def test_products_page_displays_product_data(page: Page):
-    products_page = ProductsPage(page)
+def test_products_page_displays_product_data(page: Page, product_factory):
+    payload = {
+        "name": "Playwright UI Test Product",
+        "description": "Created for browser UI verification",
+        "price": 63.25,
+        "stock_quantity": 11,
+    }
 
+    response = product_factory(payload)
+    assert response.status_code == 201
+
+    products_page = ProductsPage(page)
     products_page.open()
 
-    expect(products_page.products_table).to_contain_text("Postman QA Product")
-    expect(products_page.products_table).to_contain_text("79.99")
-    expect(products_page.products_table).to_contain_text("15")
+    expect(products_page.products_table).to_contain_text(
+        "Playwright UI Test Product"
+    )
+    expect(products_page.products_table).to_contain_text("63.25")
+    expect(products_page.products_table).to_contain_text("11")

@@ -12,7 +12,9 @@ def test_create_product_rejects_zero_price():
         "stock_quantity": 5,
     }
 
-    response = requests.post(f"{BASE_URL}/api/products/", json=payload)
+    response = requests.post(
+        f"{BASE_URL}/api/products/", json=payload, timeout=10
+    )
 
     assert response.status_code == 422
 
@@ -23,7 +25,9 @@ def test_create_product_rejects_missing_name():
         "stock_quantity": 5,
     }
 
-    response = requests.post(f"{BASE_URL}/api/products/", json=payload)
+    response = requests.post(
+        f"{BASE_URL}/api/products/", json=payload, timeout=10
+    )
 
     assert response.status_code == 422
 
@@ -36,12 +40,14 @@ def test_create_product_rejects_negative_stock():
         "stock_quantity": -1,
     }
 
-    response = requests.post(f"{BASE_URL}/api/products/", json=payload)
+    response = requests.post(
+        f"{BASE_URL}/api/products/", json=payload, timeout=10
+    )
 
     assert response.status_code == 422
 
 
-def test_create_product_accepts_zero_stock():
+def test_create_product_accepts_zero_stock(product_factory):
     payload = {
         "name": "Zero Stock Product",
         "description": "Boundary API test",
@@ -49,7 +55,7 @@ def test_create_product_accepts_zero_stock():
         "stock_quantity": 0,
     }
 
-    response = requests.post(f"{BASE_URL}/api/products/", json=payload)
+    response = product_factory(payload)
 
     assert response.status_code == 201
 
@@ -64,6 +70,8 @@ def test_create_product_rejects_missing_price():
         "stock_quantity": 5,
     }
 
-    response = requests.post(f"{BASE_URL}/api/products/", json=payload)
+    response = requests.post(
+        f"{BASE_URL}/api/products/", json=payload, timeout=10
+    )
 
     assert response.status_code == 422

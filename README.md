@@ -33,8 +33,7 @@ The project is built around a product API backed by PostgreSQL, with automated t
 
 - Playwright browser automation with Python and Pytest
 - Page Object Model (POM)
-- End-to-end product and cart validation
-- Positive and negative UI scenarios
+- Product-list page rendering and displayed product-data checks
 - Automated validation of application behavior
 
 **UI tests:** `ui-tests/`
@@ -50,6 +49,14 @@ The project includes the application/API implementation used as the testing targ
 Supporting project documentation and QA materials are maintained in:
 
 **Documentation:** `docs/`
+
+### Current Implementation Scope
+
+The implemented application and automated tests currently focus on product
+CRUD operations, product input validation, PostgreSQL data checks, health
+checks, and product-list UI verification. Shopping-cart, customer,
+authentication, and order workflows are not currently implemented in this
+project and should be treated as future scope rather than completed coverage.
 
 ## Tools & Technologies
 
