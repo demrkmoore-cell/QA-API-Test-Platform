@@ -8,7 +8,7 @@ A scoped FastAPI and PostgreSQL portfolio project demonstrating API testing, Pyt
 - Pydantic request validation for product names, prices, and stock quantities.
 - PostgreSQL persistence through SQLAlchemy.
 - Health endpoint at `/health` and HTML product list at `/products`.
-- API tests for CRUD behavior, validation, and not-found responses.
+- API tests for product list/create/retrieve/update/delete behavior, request validation, and not-found responses.
 - Database checks and Playwright UI tests using a Page Object.
 - GitHub Actions workflow that provisions PostgreSQL, initializes test data, starts the application, and runs the test suite.
 
@@ -97,7 +97,7 @@ QA-API-Test-Platform/
 ├── database/                  # Database and PostgreSQL resources
 ├── docs/                      # Project documentation
 ├── tests/
-│   ├── api/                   # API behavior and request-validation tests
+│   ├── api/                   # CRUD, request-validation, and not-found tests
 │   ├── database/              # PostgreSQL persistence tests
 │   └── ui/                    # HTML-safety regression test
 ├── ui-tests/                  # Playwright browser automation
